@@ -28,11 +28,11 @@ export async function initDb() {
     `
     CREATE TABLE IF NOT EXISTS exercises (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      userId INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
       description TEXT NOT NULL,
       duration INTEGER NOT NULL,
       date TEXT NOT NULL,
-      FOREIGN KEY (userId) REFERENCES users(id)
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `
   );

@@ -33,6 +33,32 @@ class UsersController {
       res.status(400).json({ error: err.message });
     }
   }
+  async createExercise(req, res) {
+    try {
+      const { id } = req.params;
+      const { description, duration, date } = req.body;
+      const exercise = {
+        description,
+        duration,
+        date,
+      };
+      const user = await usersService.createExercise(id, exercise);
+      res.status(201).json(user);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+  async getLogs(req, res) {
+    try {
+      const { id } = req.params;
+      const { from, to, limit } = req.query;
+
+      const result = await usersService.getUserLogs(id, { from, to, limit });
+      res.json(result);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
 }
 
 export default new UsersController();
