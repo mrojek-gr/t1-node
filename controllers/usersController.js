@@ -1,39 +1,34 @@
 import usersService from "../services/usersService.js";
+import { AppError } from "../utils/appError.js";
 
 class UsersController {
-  async getAll(req, res) {
+  async getAll(req, res, next) {
     try {
       const users = await usersService.getUsers();
-      if (!users) {
-        return res.status(404).json({ error: "Users not found" });
-      }
-      res.json(users);
+      res.status(200).json(users || []);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      next(err);
     }
   }
-  async getOne(req, res) {
+  async getOne(req, res, next) {
     try {
       const { id } = req.params;
       const user = await usersService.getUser(id);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
       res.json(user);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      next(err);
     }
   }
-  async create(req, res) {
+  async create(req, res, next) {
     try {
       const { username } = req.body;
       const user = await usersService.createUser(username);
       res.status(201).json(user);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      next(err);
     }
   }
-  async createExercise(req, res) {
+  async createExercise(req, res, next) {
     try {
       const { id } = req.params;
       const { description, duration, date } = req.body;
@@ -45,10 +40,10 @@ class UsersController {
       const user = await usersService.createExercise(id, exercise);
       res.status(201).json(user);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      next(err);
     }
   }
-  async getLogs(req, res) {
+  async getLogs(req, res, next) {
     try {
       const { id } = req.params;
       const { from, to, limit } = req.query;
@@ -56,7 +51,7 @@ class UsersController {
       const result = await usersService.getUserLogs(id, { from, to, limit });
       res.json(result);
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      next(err);
     }
   }
 }

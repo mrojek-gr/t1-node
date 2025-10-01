@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import usersRoutes from "./routes/usersRoutes.js";
+import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 dotenv.config();
 
@@ -22,5 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", usersRoutes);
+
+app.use(errorMiddleware);
 
 export default app;

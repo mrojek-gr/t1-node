@@ -1,4 +1,5 @@
 import usersRepository from "../repositories/usersRepository.js";
+import { AppError } from "../utils/appError.js";
 import { validateDate } from "../utils/dateValidator.js";
 
 class UsersService {
@@ -6,41 +7,41 @@ class UsersService {
     return usersRepository.getUsers();
   }
   async getUser(id) {
-    if (!id) {
-      throw new Error("Id is required");
+    const user = await usersRepository.getUser(id);
+    if (!user) {
+      throw new AppError("User not found", 404);
     }
-    return await usersRepository.getUser(id);
+    return user;
   }
   async createUser(username) {
     if (!username || typeof username !== "string" || !username.trim()) {
-      throw new Error("Username is required");
+      throw new AppError("Username is required", 400);
     }
     const existing = await usersRepository.findByUsername(username.trim());
     if (existing) {
-      throw new Error("Username already taken");
+      throw new AppError("Username already taken", 400);
     }
 
     return usersRepository.create(username.trim());
   }
   async createExercise(id, exercise) {
-    if (!id) {
-      throw new Error("Id is required");
-    }
-
     if (!exercise.description || typeof exercise.description !== "string") {
-      throw new Error("Description is required and must be a string");
+      throw new AppError("Description is required and must be a string", 400);
     }
 
     const durationNum = Number(exercise.duration);
-    if (!durationNum || isNaN(durationNum)) {
-      throw new Error("Duration is required and must be a number");
+    if (!durationNum || isNaN(durationNum) || durationNum < 0) {
+      throw new AppError(
+        "Duration is required and must be a positive number",
+        400
+      );
     }
 
     exercise.date = validateDate(exercise.date);
 
     const user = await usersRepository.getUser(id);
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found", 404);
     }
 
     const newExercise = await usersRepository.createExercise(id, exercise);
@@ -54,13 +55,9 @@ class UsersService {
     };
   }
   async getUserLogs(id, filters) {
-    if (!id) {
-      throw new Error("Id is required");
-    }
-
     const user = await usersRepository.getUser(id);
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found", 404);
     }
 
     const exercises = await usersRepository.getExercises(id, filters);

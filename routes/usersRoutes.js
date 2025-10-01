@@ -1,14 +1,27 @@
 import express from "express";
 import usersController from "../controllers/usersController.js";
+import { validateUserIdMiddleware } from "../middlewares/validateUserIdMiddleware.js";
+import { validateLogsQuery } from "../middlewares/validateLogsQueryMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => usersController.getAll(req, res));
-router.get("/:id", (req, res) => usersController.getOne(req, res));
-router.post("/", (req, res) => usersController.create(req, res));
-router.post("/:id/exercises", (req, res) =>
-  usersController.createExercise(req, res)
+router.get("/", usersController.getAll.bind(usersController));
+router.get(
+  "/:id",
+  validateUserIdMiddleware,
+  usersController.getOne.bind(usersController)
 );
-router.get("/:id/logs", (req, res) => usersController.getLogs(req, res));
+router.post("/", usersController.create.bind(usersController));
+router.post(
+  "/:id/exercises",
+  validateUserIdMiddleware,
+  usersController.createExercise.bind(usersController)
+);
+router.get(
+  "/:id/logs",
+  validateUserIdMiddleware,
+  validateLogsQuery,
+  usersController.getLogs.bind(usersController)
+);
 
 export default router;
